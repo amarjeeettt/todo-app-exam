@@ -38,6 +38,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
   const { user } = useUser();
 
   const fetchTasks = useCallback(async () => {
@@ -147,9 +148,20 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const fetchTasksIfStale = useCallback(() => {
+    const now = Date.now();
+    if (user && now - lastFetchTime > 30 * 60 * 1000) {
+      // 5 minutes
+      fetchTasks();
+      setLastFetchTime(now);
+    }
+  }, [user, lastFetchTime, fetchTasks]);
+
   useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+    fetchTasksIfStale(); // Fetch immediately if stale
+    const intervalId = setInterval(fetchTasksIfStale, 1800000); // Check every 30 minutes
+    return () => clearInterval(intervalId);
+  }, [fetchTasksIfStale]);
 
   return (
     <TaskContext.Provider

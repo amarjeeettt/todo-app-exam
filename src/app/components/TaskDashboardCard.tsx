@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useTasks } from "@/contexts/TaskContext";
 import TaskStatisticsSkeleton from "./skeleton/TaskStatisticsSkeleton";
 
@@ -20,41 +21,35 @@ export default function TaskDashboardCard() {
   }, [tasks]);
 
   return (
-    <Card className="w-full h-full">
-      <CardContent className="p-6">
-        <div className="flex justify-between items-stretch text-center gap-4">
-          {isLoading ? (
-            <>
-              <TaskStatisticsSkeleton />
-              <Separator orientation="vertical" decorative />
-              <TaskStatisticsSkeleton />
-              <Separator orientation="vertical" decorative />
-              <TaskStatisticsSkeleton />
-            </>
-          ) : (
-            <>
-              <TaskSection
-                number={taskStats.toDoTasks}
-                title="To do"
-                subtitle="tasks"
-              />
-              <Separator orientation="vertical" decorative />
-              <TaskSection
-                number={taskStats.completedTasks}
-                title="Completed"
-                subtitle="tasks"
-              />
-              <Separator orientation="vertical" decorative />
-              <TaskSection
-                number={taskStats.importantTasks}
-                title="Important"
-                subtitle="tasks"
-              />
-            </>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+    <>
+      <div className="w-full h-full flex justify-between items-stretch gap-4">
+        {isLoading ? (
+          <>
+            <TaskStatisticsSkeleton />
+            <TaskStatisticsSkeleton />
+            <TaskStatisticsSkeleton />
+          </>
+        ) : (
+          <>
+            <TaskSection
+              number={taskStats.toDoTasks}
+              title="To do"
+              subtitle="tasks"
+            />
+            <TaskSection
+              number={taskStats.completedTasks}
+              title="Completed"
+              subtitle="tasks"
+            />
+            <TaskSection
+              number={taskStats.importantTasks}
+              title="Important"
+              subtitle="tasks"
+            />
+          </>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -68,17 +63,27 @@ function TaskSection({
   subtitle: string;
 }) {
   return (
-    <div className="flex-1 flex flex-col">
-      <h2 className="text-2xl sm:text-3xl md:text-4xl text-textPrimary font-bold mb-1">
-        {number}
-      </h2>
-      <Separator className="my-1" decorative />
-      <div className="mt-1">
-        <h3 className="text-sm sm:text-base text-textPrimary font-semibold">
-          {title}
-        </h3>
-        <p className="text-xs sm:text-sm text-textSecondary">{subtitle}</p>
+    <Card className="flex-1 p-4">
+      <div className="flex flex-col items-center">
+        <motion.h2
+          className="text-3xl font-bold text-gray-800"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {number}
+        </motion.h2>
+        <Separator className="w-1/2 my-2" />
+        <motion.div
+          className="flex flex-col items-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+        >
+          <h3 className="text-md text-textPrimary font-semibold">{title}</h3>
+          <p className="text-xs sm:text-sm text-textSecondary">{subtitle}</p>
+        </motion.div>
       </div>
-    </div>
+    </Card>
   );
 }

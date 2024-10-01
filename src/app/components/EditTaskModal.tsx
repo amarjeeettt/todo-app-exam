@@ -4,8 +4,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,8 +41,10 @@ export default function EditTaskModal({
 }: EditTaskModalProps) {
   const [title, setTitle] = useState(task.title);
   const [remindOnTime, setRemindOnTime] = useState("");
+  const [remindOn, setRemindOn] = useState(false);
   const [isImportant, setIsImportant] = useState(task.isImportant);
   const [isCompleted, setIsCompleted] = useState(task.isCompleted);
+  const { toast } = useToast();
 
   useEffect(() => {
     setTitle(task.title);
@@ -76,47 +80,85 @@ export default function EditTaskModal({
         isImportant,
         isCompleted,
       });
+
+      toast({
+        title: "Task updated",
+        description: "Your task has been successfully updated.",
+      });
+
       onClose();
     } catch (error) {
       console.error("Error updating task:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update task. Please try again.",
+      });
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Task</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+          </DialogHeader>
+          <motion.form
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-4"
+          >
+            <div className="space-y-4">
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="title">Task</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remindOn"
+                  checked={remindOn}
+                  onCheckedChange={(checked) => setRemindOn(checked as boolean)}
+                  className={`${remindOn ? "text-white" : ""}`}
+                />
+                <Label htmlFor="remindOn">Set Reminder</Label>
+              </div>
+              <AnimatePresence>
+                {remindOn && (
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Label htmlFor="remindOnTime">Remind On</Label>
+                    <Input
+                      id="remindOnTime"
+                      type="time"
+                      value={remindOnTime}
+                      onChange={(e) => setRemindOnTime(e.target.value)}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <div>
-              <Label htmlFor="remindOn">Reminder (optional)</Label>
-              <Input
-                id="remindOn"
-                type="time"
-                value={remindOnTime}
-                onChange={(e) => setRemindOnTime(e.target.value)}
-              />
+            <div className="pt-4">
+              <Button type="submit" className="w-full text-white bg-secondary">
+                Save Changes
+              </Button>
             </div>
-          </div>
-          <DialogFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">Save Changes</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          </motion.form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

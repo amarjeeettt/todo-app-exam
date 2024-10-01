@@ -12,19 +12,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
+        primary: "#005073",
+        secondary: "#00A8E8",
         disable: "#A6CFE2",
         bgPrimary: "#F5F5F5",
         bgSecondary: "#FFFFFF",
         textPrimary: "#333333",
         textSecondary: "#666666",
+        textDisable: "#5A6978",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

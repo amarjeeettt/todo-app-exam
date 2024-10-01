@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -46,6 +46,12 @@ export default function TaskCard({
   const [checked, setChecked] = useState(isCompleted);
   const [important, setImportant] = useState(isImportant);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Get the current date
+  const today = new Date();
+
+  // Strip out the time from dates to compare only the date part
+  const isPastTask = selectedDate.toDateString() < today.toDateString(); // Check if the task date is before today
 
   const handleImportantChange = async () => {
     const newImportant = !important;
@@ -103,19 +109,26 @@ export default function TaskCard({
           <Checkbox
             checked={checked}
             onCheckedChange={handleCheckedChange} // Use the new handler
-            className="h-5 w-5 rounded-full border-2 border-blue-800 flex-shrink-0"
+            className="h-5 w-5 rounded-full border-2 border-blue-800 flex-shrink-0 data-[state=checked]:bg-white data-[state=checked]:text-blue-800"
+            disabled={isPastTask}
           />
         </div>
         <Card
           className={`flex-grow flex items-center py-3 px-4 ${
-            checked ? "bg-blue-200" : "bg-blue-800 text-white"
-          } rounded-full`}
+            checked ? "bg-disable text-textDisable" : "bg-primary text-white"
+          } rounded-lg`}
         >
           <div className="w-8 flex-shrink-0" />
           <div className="flex-grow min-w-0 pr-4">
-            <h3 className="text-lg font-semibold truncate">{title}</h3>
+            <h3
+              className={`text-lg font-semibold truncate ${
+                checked ? "line-through" : ""
+              }`}
+            >
+              {title}
+            </h3>
             <p className="text-sm opacity-70 truncate">
-              {time
+              {time && !isNaN(new Date(time).getTime())
                 ? new Date(time).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -131,12 +144,14 @@ export default function TaskCard({
                   variant="ghost"
                   size="icon"
                   className={`h-8 w-8 p-0 rounded-full ${
-                    checked
-                      ? "hover:bg-blue-300 text-blue-800"
-                      : "hover:bg-blue-700 text-white"
+                    checked ? "hover:bg-[#8AB3C8]" : "hover:bg-[#003A50]"
                   }`}
                 >
-                  <MoreHorizontal className="h-5 w-5" />
+                  <MoreHorizontal
+                    className={`h-5 w-5 ${
+                      checked ? "text-textDisable" : "text-white"
+                    }`}
+                  />
                   <span className="sr-only">Open menu</span>
                 </Button>
               </PopoverTrigger>
@@ -146,6 +161,7 @@ export default function TaskCard({
                     variant="ghost"
                     onClick={handleImportantChange}
                     className="justify-start"
+                    disabled={isCompleted || isPastTask}
                   >
                     <Star className="mr-2 h-4 w-4" />
                     {important ? "Remove importance" : "Mark as important"}
@@ -154,6 +170,7 @@ export default function TaskCard({
                     variant="ghost"
                     className="justify-start"
                     onClick={handleEditTask}
+                    disabled={isCompleted || isPastTask}
                   >
                     <Edit className="mr-2 h-4 w-4" />
                     Edit task

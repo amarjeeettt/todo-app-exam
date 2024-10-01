@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { Progress } from "@/components/ui/progress";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTasks } from "@/contexts/TaskContext";
 import TaskProgressSkeleton from "./skeleton/TaskProgressSkeleton";
@@ -35,38 +36,45 @@ export default function ProgressCard() {
   const { title, message } = progressMessages[messageIndex];
 
   return (
-    <Card className="w-full h-full">
-      <CardContent className="p-6">
-        {isLoading ? (
-          <TaskProgressSkeleton />
-        ) : (
-          <>
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-3xl font-bold text-primary mb-2">
-                  {title}
-                </h2>
-                <p className="text-sm text-textPrimary mb-4">{message}</p>
+    <>
+      <Card className="w-full h-full">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="p-6"
+        >
+          {isLoading ? (
+            <TaskProgressSkeleton />
+          ) : (
+            <>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-primary mb-2">
+                    {title}
+                  </h2>
+                  <p className="text-sm text-textPrimary mb-4">{message}</p>
+                </div>
+                <Image
+                  src="/images/hourglass.png"
+                  alt="Hourglass"
+                  width={50}
+                  height={50}
+                />
               </div>
-              <Image
-                src="/images/hourglass.png"
-                alt="Hourglass"
-                width={50}
-                height={50}
+              <Progress
+                className="[&>*]:bg-secondary"
+                value={progress}
+                max={100}
               />
-            </div>
-            <Progress
-              className="[&>*]:bg-Secondary"
-              value={progress}
-              max={100}
-            />
-            <p className="text-xs text-textSecondary mt-2">
-              {completedTasks} out of {totalTasks}{" "}
-              {totalTasks <= 1 ? "task" : "tasks"} are completed
-            </p>
-          </>
-        )}
-      </CardContent>
-    </Card>
+              <p className="text-xs text-textSecondary mt-2">
+                {completedTasks} out of {totalTasks}{" "}
+                {totalTasks <= 1 ? "task" : "tasks"} are completed
+              </p>
+            </>
+          )}
+        </motion.div>
+      </Card>
+    </>
   );
 }
