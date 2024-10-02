@@ -1,11 +1,12 @@
 "use client";
 
-import {
+import React, {
   createContext,
   useContext,
   useState,
   useEffect,
   useCallback,
+  useMemo,
   ReactNode,
 } from "react";
 import { useUser } from "./UserContext";
@@ -38,7 +39,6 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastFetchTime, setLastFetchTime] = useState(0);
   const { user } = useUser();
 
   const fetchTasks = useCallback(async () => {
@@ -64,7 +64,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const createTask = async (taskData: CreateTaskData) => {
+  const createTask = useCallback(async (taskData: CreateTaskData) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -89,47 +89,52 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const updateTask = async (id: number, updates: UpdateTaskData) => {
-    setError(null);
+  const updateTask = useCallback(
+    async (id: number, updates: UpdateTaskData) => {
+      setError(null);
 
-    setTasks((prevTasks) =>
-      prevTasks.map((task) => (task.id === id ? { ...task, ...updates } : task))
-    );
-
-    try {
-      const response = await fetch(`/api/tasks/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updates),
-      });
-      if (response.ok) {
-        const updatedTask: Task = await response.json();
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task.id === id ? { ...task, ...updatedTask } : task
-          )
-        );
-      } else {
-        throw new Error(`Failed to update task: ${response.statusText}`);
-      }
-    } catch (error) {
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === id ? { ...task, ...updates } : task
         )
       );
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
-      );
-      console.error("Error updating task:", error);
-    }
-  };
 
-  const deleteTask = async (id: number) => {
+      try {
+        const response = await fetch(`/api/tasks/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updates),
+        });
+        if (response.ok) {
+          const updatedTask: Task = await response.json();
+          setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+              task.id === id ? { ...task, ...updatedTask } : task
+            )
+          );
+        } else {
+          throw new Error(`Failed to update task: ${response.statusText}`);
+        }
+      } catch (error) {
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === id ? { ...task, ...updates } : task
+          )
+        );
+        setError(
+          error instanceof Error ? error.message : "An unknown error occurred"
+        );
+        console.error("Error updating task:", error);
+      }
+    },
+    []
+  );
+
+  const deleteTask = useCallback(async (id: number) => {
     setError(null);
     try {
       const response = await fetch(`/api/tasks/${id}`, {
@@ -144,39 +149,29 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       setError(
         error instanceof Error ? error.message : "An unknown error occurred"
       );
-      console.error("Error creating task:", error);
+      console.error("Error deleting task:", error);
     }
-  };
-
-  const fetchTasksIfStale = useCallback(() => {
-    const now = Date.now();
-    if (user && now - lastFetchTime > 30 * 60 * 1000) {
-      // 5 minutes
-      fetchTasks();
-      setLastFetchTime(now);
-    }
-  }, [user, lastFetchTime, fetchTasks]);
+  }, []);
 
   useEffect(() => {
-    fetchTasksIfStale(); // Fetch immediately if stale
-    const intervalId = setInterval(fetchTasksIfStale, 1800000); // Check every 30 minutes
-    return () => clearInterval(intervalId);
-  }, [fetchTasksIfStale]);
+    fetchTasks();
+  }, [fetchTasks]);
+
+  const contextValue = useMemo(
+    () => ({
+      tasks,
+      isLoading,
+      error,
+      fetchTasks,
+      createTask,
+      updateTask,
+      deleteTask,
+    }),
+    [tasks, isLoading, error, fetchTasks, createTask, updateTask, deleteTask]
+  );
 
   return (
-    <TaskContext.Provider
-      value={{
-        tasks,
-        isLoading,
-        error,
-        fetchTasks,
-        createTask,
-        updateTask,
-        deleteTask,
-      }}
-    >
-      {children}
-    </TaskContext.Provider>
+    <TaskContext.Provider value={contextValue}>{children}</TaskContext.Provider>
   );
 }
 

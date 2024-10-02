@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
@@ -7,11 +7,7 @@ import { useTasks } from "@/contexts/TaskContext";
 import TaskProgressSkeleton from "./skeleton/TaskProgressSkeleton";
 
 export default function ProgressCard() {
-  const { tasks, isLoading, fetchTasks } = useTasks();
-
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+  const { tasks, isLoading } = useTasks();
 
   const { totalTasks, completedTasks, progress } = useMemo(() => {
     const totalTasks = tasks.length;

@@ -40,8 +40,8 @@ export default function HomeClient() {
               <UserMenu onLogout={handleLogout} />
             </div>
           </div>
-          <div className="flex flex-col gap-4 h-full md:flex-col lg:flex-row">
-            <div className="order-2 md:order-2 lg:order-1 lg:w-1/3 flex flex-col gap-4">
+          <div className="flex flex-col gap-7 h-full md:flex-col lg:flex-row">
+            <div className="order-2 md:order-2 lg:order-1 lg:w-1/3 flex flex-col gap-7">
               <Calendar
                 selectedDate={selectedDate}
                 setSelectedDate={setSelectedDate}

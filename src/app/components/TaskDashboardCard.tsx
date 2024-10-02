@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
@@ -6,11 +6,7 @@ import { useTasks } from "@/contexts/TaskContext";
 import TaskStatisticsSkeleton from "./skeleton/TaskStatisticsSkeleton";
 
 export default function TaskDashboardCard() {
-  const { tasks, isLoading, fetchTasks } = useTasks();
-
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+  const { tasks, isLoading } = useTasks();
 
   const taskStats = useMemo(() => {
     const toDoTasks = tasks.filter((task) => !task.isCompleted).length;
