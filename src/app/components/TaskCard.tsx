@@ -134,10 +134,17 @@ export default function TaskCard({
             </motion.h3>
             <motion.p className="text-sm opacity-70 truncate" layout="position">
               {time && !isNaN(new Date(time).getTime())
-                ? new Date(time).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
+                ? (() => {
+                    const date = new Date(time);
+                    let hours = date.getUTCHours();
+                    const minutes = date.getUTCMinutes();
+                    const ampm = hours >= 12 ? "PM" : "AM";
+                    hours = hours % 12;
+                    hours = hours ? hours : 12; // the hour '0' should be '12'
+                    const strHours = hours.toString().padStart(2, "0");
+                    const strMinutes = minutes.toString().padStart(2, "0");
+                    return `${strHours}:${strMinutes} ${ampm}`;
+                  })()
                 : "No reminder"}
             </motion.p>
           </motion.div>

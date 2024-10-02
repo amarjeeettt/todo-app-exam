@@ -16,7 +16,7 @@ import { Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTasks } from "@/contexts/TaskContext";
-import { format, set } from "date-fns";
+import { format } from "date-fns";
 
 export default function TaskModal({
   open,
@@ -42,12 +42,13 @@ export default function TaskModal({
       let remindOnDate = null;
       if (remindTime) {
         const [hours, minutes] = remindTime.split(":").map(Number);
-        remindOnDate = set(new Date(selectedDate.toLocaleString()), {
-          hours,
-          minutes,
-          seconds: 0,
-          milliseconds: 0,
-        });
+        const localDate = new Date(selectedDate);
+        localDate.setHours(hours, minutes, 0, 0);
+
+        // Convert local date to UTC
+        remindOnDate = new Date(
+          localDate.getTime() - localDate.getTimezoneOffset() * 60000
+        );
       }
 
       await createTask({

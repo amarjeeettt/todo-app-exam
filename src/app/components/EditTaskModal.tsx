@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { format, set } from "date-fns";
 
 interface EditTaskModalProps {
   isOpen: boolean;
@@ -53,9 +52,15 @@ export default function EditTaskModal({
     setIsCompleted(task.isCompleted);
     if (task.remindOn) {
       const remindOnDate = new Date(task.remindOn);
-      setRemindOnTime(format(remindOnDate, "HH:mm"));
+      setRemindOnTime(
+        `${String(remindOnDate.getUTCHours()).padStart(2, "0")}:${String(
+          remindOnDate.getUTCMinutes()
+        ).padStart(2, "0")}`
+      );
+      setRemindOn(true);
     } else {
       setRemindOnTime("");
+      setRemindOn(false);
     }
   }, [task]);
 
@@ -64,21 +69,18 @@ export default function EditTaskModal({
     setIsLoading(true);
     try {
       let remindOnDate = null;
-      if (remindOnTime) {
+      if (remindOn && remindOnTime) {
         const [hours, minutes] = remindOnTime.split(":").map(Number);
-        remindOnDate = set(new Date(selectedDate.toLocaleString()), {
-          hours,
-          minutes,
-          seconds: 0,
-          milliseconds: 0,
-        });
+        const localDate = new Date(selectedDate);
+        localDate.setHours(hours, minutes, 0, 0);
+        remindOnDate = new Date(
+          localDate.getTime() - localDate.getTimezoneOffset() * 60000
+        );
       }
 
       await onUpdate({
         title,
-        remindOn: remindOnDate
-          ? format(remindOnDate, "yyyy-MM-dd'T'HH:mm:ss")
-          : null,
+        remindOn: remindOnDate ? remindOnDate.toISOString() : null,
         isImportant,
         isCompleted,
       });

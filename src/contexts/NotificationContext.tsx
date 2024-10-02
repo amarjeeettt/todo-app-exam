@@ -71,18 +71,24 @@ export function NotificationProvider({
   const checkReminders = useCallback(() => {
     const now = new Date();
     tasks.forEach((task) => {
-      const remindOn = task.remindOn ? new Date(task.remindOn) : null;
-      if (
-        remindOn &&
-        remindOn > lastCheckTime &&
-        remindOn <= now &&
-        !task.isCompleted
-      ) {
-        addNotification({
-          taskId: task.id,
-          title: "Task Reminder",
-          message: `It's time for: ${task.title}`,
-        });
+      if (task.remindOn) {
+        const remindOn = new Date(task.remindOn);
+        // Convert UTC time to local time
+        const localRemindOn = new Date(
+          remindOn.getTime() + remindOn.getTimezoneOffset() * 60000
+        );
+
+        if (
+          localRemindOn > lastCheckTime &&
+          localRemindOn <= now &&
+          !task.isCompleted
+        ) {
+          addNotification({
+            taskId: task.id,
+            title: "Task Reminder",
+            message: `It's time for: ${task.title}`,
+          });
+        }
       }
     });
     setLastCheckTime(now);
