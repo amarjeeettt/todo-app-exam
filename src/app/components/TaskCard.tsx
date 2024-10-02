@@ -12,6 +12,7 @@ import { Star, MoreHorizontal, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EditTaskModal from "./EditTaskModal";
 import { isToday, isFuture } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TaskCardProps {
@@ -19,7 +20,7 @@ interface TaskCardProps {
   title: string;
   time?: string;
   selectedDate: Date;
-  remindOn: string | null;
+  remindOn: Date | null;
   isImportant?: boolean;
   isCompleted?: boolean;
   onDelete: (id: number) => Promise<void>;
@@ -27,7 +28,7 @@ interface TaskCardProps {
     id: number,
     updates: {
       title?: string;
-      remindOn?: string | null;
+      remindOn?: Date | null;
       isImportant?: boolean;
       isCompleted?: boolean;
     }
@@ -37,7 +38,6 @@ interface TaskCardProps {
 export default function TaskCard({
   id,
   title,
-  time,
   selectedDate,
   remindOn,
   isImportant,
@@ -81,12 +81,15 @@ export default function TaskCard({
 
   const handleUpdateTask = async (updates: {
     title?: string;
-    remindOn?: string | null;
+    remindOn?: Date | null;
     isImportant?: boolean;
     isCompleted?: boolean;
   }) => {
     try {
-      await onUpdate(id, updates);
+      await onUpdate(id, {
+        ...updates,
+        remindOn: updates.remindOn instanceof Date ? updates.remindOn : null,
+      });
     } catch (error) {
       console.error("Failed to update task:", error);
     }
@@ -98,6 +101,19 @@ export default function TaskCard({
     } catch (error) {
       console.error("Failed to delete task:", error);
     }
+  };
+
+  const formatRemindOn = (remindOn: Date | string | null) => {
+    if (!remindOn) return "No reminder";
+
+    const remindOnDate =
+      remindOn instanceof Date ? remindOn : new Date(remindOn);
+
+    return formatInTimeZone(
+      remindOnDate,
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      "h:mm a"
+    );
   };
 
   return (
@@ -133,12 +149,7 @@ export default function TaskCard({
               {title}
             </motion.h3>
             <motion.p className="text-sm opacity-70 truncate" layout="position">
-              {time && !isNaN(new Date(time).getTime())
-                ? new Date(time).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "No reminder"}
+              {formatRemindOn(remindOn)}
             </motion.p>
           </motion.div>
           <div className="flex items-center space-x-2 flex-shrink-0">

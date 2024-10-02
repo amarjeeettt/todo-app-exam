@@ -41,9 +41,7 @@ export default function Calendar({
 
   const hasTasksOnDay = (date: Date) => {
     return tasks.some(
-      (task) =>
-        format(new Date(task.createdAt), "yyyy-MM-dd") ===
-        format(date, "yyyy-MM-dd")
+      (task) => new Date(task.createdAt).getTime() === date.getTime()
     );
   };
 
@@ -75,7 +73,7 @@ export default function Calendar({
             className="h-10 flex items-center justify-center"
           >
             <Button
-              onClick={() => handleDateClick(cloneDay)}
+              onClick={() => !isPastDate && handleDateClick(cloneDay)}
               variant={isSameDay(day, selectedDate) ? "default" : "ghost"}
               className={`h-8 w-8 p-0 font-normal ${
                 !isSameMonth(day, monthStart) ? "text-muted-foreground" : ""

@@ -16,7 +16,8 @@ import { Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTasks } from "@/contexts/TaskContext";
-import { format, set } from "date-fns";
+import { set, startOfDay } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
 export default function TaskModal({
   open,
@@ -38,24 +39,26 @@ export default function TaskModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const formattedCreatedAt = format(selectedDate, "yyyy-MM-dd");
-      let remindOnDate = null;
+      const createdAt = startOfDay(selectedDate);
+      let remindOnDate: Date | null = null;
+
       if (remindTime) {
         const [hours, minutes] = remindTime.split(":").map(Number);
-        remindOnDate = set(new Date(selectedDate.toLocaleString()), {
+        const localRemindDate = set(new Date(selectedDate), {
           hours,
           minutes,
           seconds: 0,
           milliseconds: 0,
         });
+
+        // Convert local time to UTC
+        remindOnDate = toZonedTime(localRemindDate, "UTC") as Date;
       }
 
       await createTask({
         title,
-        createdAt: formattedCreatedAt,
-        remindOn: remindOnDate
-          ? format(remindOnDate, "yyyy-MM-dd'T'HH:mm:ss")
-          : null,
+        createdAt,
+        remindOn: remindOnDate,
         isImportant: false,
         isCompleted: false,
       });

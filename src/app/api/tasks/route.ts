@@ -9,7 +9,12 @@ export async function GET() {
     const tasks = await prisma.task.findMany({
       where: { userID },
     });
-    return NextResponse.json(tasks, { status: 200 });
+
+    const formattedTasks = tasks.map((task) => ({
+      ...task,
+      remindOn: task.remindOn ? new Date(task.remindOn).toLocaleString() : null,
+    }));
+    return NextResponse.json(formattedTasks, { status: 200 });
   } catch (error) {
     if (
       error instanceof AuthenticationError ||
@@ -35,8 +40,8 @@ export async function POST(req: Request) {
     const newTask = await prisma.task.create({
       data: {
         title,
-        createdAt: new Date(createdAt),
-        remindOn: remindOn ? new Date(remindOn) : null,
+        createdAt: new Date(createdAt).toISOString(),
+        remindOn: remindOn ? new Date(remindOn).toISOString() : null,
         isImportant,
         isCompleted,
         user: {
