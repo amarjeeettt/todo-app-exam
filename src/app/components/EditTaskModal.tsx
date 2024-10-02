@@ -11,7 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { format, set } from "date-fns";
+import { format } from "date-fns";
+import moment from "moment";
 
 interface EditTaskModalProps {
   isOpen: boolean;
@@ -52,10 +53,12 @@ export default function EditTaskModal({
     setIsImportant(task.isImportant);
     setIsCompleted(task.isCompleted);
     if (task.remindOn) {
-      const remindOnDate = new Date(task.remindOn);
-      setRemindOnTime(format(remindOnDate, "HH:mm"));
+      const remindOnMoment = moment(task.remindOn);
+      setRemindOnTime(remindOnMoment.format("HH:mm")); // Set time in HH:mm format
+      setRemindOn(true);
     } else {
       setRemindOnTime("");
+      setRemindOn(false);
     }
   }, [task]);
 
@@ -65,13 +68,15 @@ export default function EditTaskModal({
     try {
       let remindOnDate = null;
       if (remindOnTime) {
-        const [hours, minutes] = remindOnTime.split(":").map(Number);
-        remindOnDate = set(new Date(selectedDate.toLocaleString()), {
-          hours,
-          minutes,
-          seconds: 0,
-          milliseconds: 0,
-        });
+        // Combine selectedDate and remindOnTime using moment.js
+        remindOnDate = moment(selectedDate)
+          .set({
+            hour: Number(remindOnTime.split(":")[0]),
+            minute: Number(remindOnTime.split(":")[1]),
+            second: 0,
+            millisecond: 0,
+          })
+          .toISOString(); // Convert to ISO string for API compatibility
       }
 
       await onUpdate({
