@@ -11,6 +11,7 @@ import {
 import { Star, MoreHorizontal, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EditTaskModal from "./EditTaskModal";
+import moment from "moment";
 import { isToday, isFuture } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -133,7 +134,9 @@ export default function TaskCard({
               {title}
             </motion.h3>
             <motion.p className="text-sm opacity-70 truncate" layout="position">
-              {time ? `${time.slice(11, 16)}` : "No reminder"}
+              {time && !isNaN(new Date(time).getTime())
+                ? moment(time).local().format("hh:mm A") // Convert to local time and format
+                : "No reminder"}
             </motion.p>
           </motion.div>
           <div className="flex items-center space-x-2 flex-shrink-0">
