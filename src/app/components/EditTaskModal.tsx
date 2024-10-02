@@ -12,14 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { format, set } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 
 interface EditTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUpdate: (updates: {
     title?: string;
-    remindOn?: Date | null;
+    remindOn?: string | null;
     isImportant?: boolean;
     isCompleted?: boolean;
   }) => Promise<void>;
@@ -27,7 +26,7 @@ interface EditTaskModalProps {
   task: {
     id: number;
     title: string;
-    remindOn: Date | null;
+    remindOn: string | null;
     isImportant: boolean;
     isCompleted: boolean;
   };
@@ -65,23 +64,21 @@ export default function EditTaskModal({
     setIsLoading(true);
     try {
       let remindOnDate = null;
-
-      if (remindOn && remindOnTime) {
+      if (remindOnTime) {
         const [hours, minutes] = remindOnTime.split(":").map(Number);
-        const localRemindDate = set(new Date(selectedDate), {
+        remindOnDate = set(new Date(selectedDate.toLocaleString()), {
           hours,
           minutes,
           seconds: 0,
           milliseconds: 0,
         });
-
-        // Convert local time to UTC
-        remindOnDate = toZonedTime(localRemindDate, "UTC") as Date;
       }
 
       await onUpdate({
         title,
-        remindOn: remindOnDate,
+        remindOn: remindOnDate
+          ? format(remindOnDate, "yyyy-MM-dd'T'HH:mm:ss")
+          : null,
         isImportant,
         isCompleted,
       });

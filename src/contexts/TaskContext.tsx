@@ -14,8 +14,8 @@ import { useUser } from "./UserContext";
 interface Task {
   id: number;
   title: string;
-  createdAt: Date;
-  remindOn: Date | null;
+  createdAt: string;
+  remindOn: string | null;
   isCompleted: boolean;
   isImportant: boolean;
 }
@@ -49,12 +49,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         const response = await fetch("/api/tasks");
         if (response.ok) {
           const data: Task[] = await response.json();
-          const parsedData = data.map((task) => ({
-            ...task,
-            createdAt: new Date(task.createdAt),
-            remindOn: task.remindOn ? new Date(task.remindOn) : null,
-          }));
-          setTasks(parsedData);
+          setTasks(data);
         } else {
           throw new Error(`Failed to fetch tasks: ${response.statusText}`);
         }
@@ -73,22 +68,13 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      const formattedTaskData = {
-        ...taskData,
-        createdAt: new Date(taskData.createdAt).toISOString(),
-        remindOn: taskData.remindOn
-          ? new Date(taskData.remindOn).toISOString()
-          : null,
-      };
-
       const response = await fetch("/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formattedTaskData),
+        body: JSON.stringify(taskData),
       });
-
       if (response.ok) {
         const newTask: Task = await response.json();
         setTasks((prevTasks) => [...prevTasks, newTask]);
@@ -109,7 +95,6 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     async (id: number, updates: UpdateTaskData) => {
       setError(null);
 
-      // Optimistic UI update
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === id ? { ...task, ...updates } : task
@@ -117,21 +102,13 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       );
 
       try {
-        const formattedUpdates = {
-          ...updates,
-          remindOn: updates.remindOn
-            ? new Date(updates.remindOn).toISOString()
-            : null,
-        };
-
         const response = await fetch(`/api/tasks/${id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formattedUpdates),
+          body: JSON.stringify(updates),
         });
-
         if (response.ok) {
           const updatedTask: Task = await response.json();
           setTasks((prevTasks) =>
@@ -143,6 +120,11 @@ export function TaskProvider({ children }: { children: ReactNode }) {
           throw new Error(`Failed to update task: ${response.statusText}`);
         }
       } catch (error) {
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === id ? { ...task, ...updates } : task
+          )
+        );
         setError(
           error instanceof Error ? error.message : "An unknown error occurred"
         );

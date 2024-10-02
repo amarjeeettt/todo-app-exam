@@ -17,33 +17,30 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
 
   const isAddTaskAllowed = isToday(selectedDate) || isFuture(selectedDate);
 
-  // Refactor to use formatted date comparison
   const todayTasks = tasks.filter(
     (task) =>
       new Date(task.createdAt).toDateString() === selectedDate.toDateString()
   );
 
-  // Separate active and completed tasks
-  const activeTasks = todayTasks.filter((task) => !task.isCompleted);
-  const completedTasks = todayTasks.filter((task) => task.isCompleted);
-
   // Group tasks by importance and completion status
   const groupedTasks = [
     {
       label: "Important Active Tasks",
-      tasks: activeTasks.filter((task) => task.isImportant),
+      tasks: todayTasks.filter((task) => !task.isCompleted && task.isImportant),
     },
     {
       label: "Active Tasks",
-      tasks: activeTasks.filter((task) => !task.isImportant),
+      tasks: todayTasks.filter(
+        (task) => !task.isCompleted && !task.isImportant
+      ),
     },
     {
       label: "Important Completed Tasks",
-      tasks: completedTasks.filter((task) => task.isImportant),
+      tasks: todayTasks.filter((task) => task.isCompleted && task.isImportant),
     },
     {
       label: "Completed Tasks",
-      tasks: completedTasks.filter((task) => !task.isImportant),
+      tasks: todayTasks.filter((task) => task.isCompleted && !task.isImportant),
     },
   ];
 
@@ -110,6 +107,9 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
                             <TaskCard
                               id={task.id}
                               title={task.title}
+                              time={
+                                task.remindOn ? task.remindOn : "No reminder"
+                              }
                               selectedDate={selectedDate}
                               remindOn={task.remindOn}
                               isImportant={task.isImportant}
