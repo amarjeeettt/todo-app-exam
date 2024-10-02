@@ -43,12 +43,8 @@ export default function TaskModal({
       if (remindTime) {
         const [hours, minutes] = remindTime.split(":").map(Number);
         const localDate = new Date(selectedDate);
-        localDate.setHours(hours, minutes, 0, 0);
-
-        // Convert local date to UTC
-        remindOnDate = new Date(
-          localDate.getTime() - localDate.getTimezoneOffset() * 60000
-        );
+        localDate.setUTCHours(hours, minutes, 0, 0);
+        remindOnDate = localDate;
       }
 
       await createTask({
