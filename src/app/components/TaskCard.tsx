@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import EditTaskModal from "./EditTaskModal";
 import { isToday, isFuture } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
 
 interface TaskCardProps {
   id: number;
@@ -134,9 +133,7 @@ export default function TaskCard({
               {title}
             </motion.h3>
             <motion.p className="text-sm opacity-70 truncate" layout="position">
-              {time && !isNaN(new Date(time).getTime())
-                ? format(new Date(time), "hh:mm a")
-                : "No reminder"}
+              {time ? `${time.slice(11, 16)}` : "No reminder"}
             </motion.p>
           </motion.div>
           <div className="flex items-center space-x-2 flex-shrink-0">
