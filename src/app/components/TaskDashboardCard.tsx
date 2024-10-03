@@ -8,6 +8,7 @@ import TaskStatisticsSkeleton from "./skeleton/TaskStatisticsSkeleton";
 export default function TaskDashboardCard() {
   const { tasks, isLoading } = useTasks();
 
+  // Calculate task statistics
   const taskStats = useMemo(() => {
     const toDoTasks = tasks.filter((task) => !task.isCompleted).length;
     const completedTasks = tasks.filter((task) => task.isCompleted).length;

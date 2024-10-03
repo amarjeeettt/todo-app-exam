@@ -29,18 +29,26 @@ export default function TaskModal({
   selectedDate: Date;
   disabled?: boolean;
 }) {
+  // State management for form inputs and UI
   const [title, setTitle] = useState("");
   const [remindTime, setRemindTime] = useState("");
   const [remindOn, setRemindOn] = useState(false);
+
+  // Custom hooks for task management and notifications
   const { createTask, isLoading } = useTasks();
   const { toast } = useToast();
 
+  // Handles form submission to create a new task
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
+      // Format the creation date and calculate reminder time if set
       const formattedCreatedAt = format(selectedDate, "yyyy-MM-dd");
       let remindOnDate = null;
+
       if (remindTime) {
+        // Convert local time to UTC for consistent storage
         const [hours, minutes] = remindTime.split(":").map(Number);
         const localDate = new Date(selectedDate);
         localDate.setHours(hours, minutes, 0, 0);
@@ -49,6 +57,7 @@ export default function TaskModal({
         );
       }
 
+      // Call the createTask function from the context
       await createTask({
         title,
         createdAt: formattedCreatedAt,
@@ -57,16 +66,21 @@ export default function TaskModal({
         isCompleted: false,
       });
 
+      // Show success toast notification
       toast({
         title: "Task created",
         description: "Your new task has been successfully created.",
       });
 
+      // Reset input fields and close modal
       setTitle("");
       setRemindTime("");
+      setRemindOn(false);
       setOpen(false);
     } catch (error) {
       console.error("Error creating task:", error);
+
+      // Show error toast notification
       toast({
         variant: "destructive",
         title: "Error",
@@ -101,6 +115,7 @@ export default function TaskModal({
             className="space-y-4"
           >
             <div className="space-y-4">
+              {/* Task title input */}
               <div className="flex flex-col space-y-2">
                 <Label htmlFor="title">Task</Label>
                 <Input
@@ -111,6 +126,7 @@ export default function TaskModal({
                   disabled={isLoading}
                 />
               </div>
+              {/* Reminder checkbox */}
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="remindOn"
@@ -120,6 +136,7 @@ export default function TaskModal({
                 />
                 <Label htmlFor="remindOn">Set Reminder</Label>
               </div>
+              {/* Animated reminder time input */}
               <AnimatePresence>
                 {remindOn && (
                   <motion.div
@@ -141,6 +158,7 @@ export default function TaskModal({
                 )}
               </AnimatePresence>
             </div>
+            {/* Submit button with loading state */}
             <div className="pt-4">
               <Button
                 type="submit"

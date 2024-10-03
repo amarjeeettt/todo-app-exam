@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useTasks } from "./TaskContext";
 
-// Types
+// Define Notification interface
 interface Notification {
   id: number;
   taskId: number;
@@ -17,6 +17,7 @@ interface Notification {
   isRead: boolean;
 }
 
+// Define NotificationContext interface
 interface NotificationContextType {
   notifications: Notification[];
   addNotification: (
@@ -26,12 +27,13 @@ interface NotificationContextType {
   clearNotifications: () => void;
 }
 
-// Context
+// Create context
 const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined
 );
 
-const generateNotificationId = () => Date.now(); // Can be enhanced for uniqueness
+// Simple function to generate notification ID
+const generateNotificationId = () => Date.now();
 
 // NotificationProvider Component
 export function NotificationProvider({
@@ -43,6 +45,7 @@ export function NotificationProvider({
   const { tasks } = useTasks();
   const [lastCheckTime, setLastCheckTime] = useState<Date>(new Date());
 
+  // Add a new notification
   const addNotification = useCallback(
     (notification: Omit<Notification, "id" | "createdAt" | "isRead">) => {
       const newNotification: Notification = {
@@ -56,6 +59,7 @@ export function NotificationProvider({
     []
   );
 
+  // Mark a notification as read
   const markAsRead = useCallback((id: number) => {
     setNotifications((prev) =>
       prev.map((notif) =>
@@ -64,10 +68,12 @@ export function NotificationProvider({
     );
   }, []);
 
+  // Clear all notifications
   const clearNotifications = useCallback(() => {
     setNotifications([]);
   }, []);
 
+  // Check for reminders and create notifications
   const checkReminders = useCallback(() => {
     const now = new Date();
     tasks.forEach((task) => {
@@ -77,7 +83,6 @@ export function NotificationProvider({
         const localRemindOn = new Date(
           remindOn.getTime() + remindOn.getTimezoneOffset() * 60000
         );
-
         if (
           localRemindOn > lastCheckTime &&
           localRemindOn <= now &&
@@ -94,6 +99,7 @@ export function NotificationProvider({
     setLastCheckTime(now);
   }, [tasks, lastCheckTime, addNotification]);
 
+  // Set up interval to check reminders
   useEffect(() => {
     const intervalId = setInterval(checkReminders, 5000); // Check every 5 seconds
     return () => clearInterval(intervalId);
@@ -108,7 +114,7 @@ export function NotificationProvider({
   );
 }
 
-// Custom Hook
+// Custom Hook to use the NotificationContext
 export function useNotifications() {
   const context = useContext(NotificationContext);
   if (!context) {

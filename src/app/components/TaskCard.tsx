@@ -49,36 +49,42 @@ export default function TaskCard({
   const [important, setImportant] = useState(isImportant);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Allow editing tasks only if the selected date is today or in the future
   const isEditTaskAllowed = isToday(selectedDate) || isFuture(selectedDate);
 
+  // Toggle importance of the task and update the state
   const handleImportantChange = async () => {
     const newImportant = !important;
     setImportant(newImportant);
+
     try {
       await onUpdate(id, { isImportant: newImportant });
     } catch (error) {
       console.error("Failed to update task importance:", error);
-      // Revert the importance state if the update fails
-      setImportant(!newImportant);
+      setImportant(!newImportant); // Revert on failure
     }
   };
 
+  // Handle change in completion status
   const handleCheckedChange = async (value: boolean | "indeterminate") => {
     if (typeof value === "boolean") {
       setChecked(value);
+
       try {
         await onUpdate(id, { isCompleted: value });
       } catch (error) {
         console.error("Failed to update task completion status:", error);
-        setChecked(!value);
+        setChecked(!value); // Revert on failure
       }
     }
   };
 
+  // Open the edit task modal
   const handleEditTask = () => {
     setIsEditModalOpen(true);
   };
 
+  // Update the task with new values
   const handleUpdateTask = async (updates: {
     title?: string;
     remindOn?: string | null;
@@ -92,6 +98,7 @@ export default function TaskCard({
     }
   };
 
+  // Delete the task
   const handleDeleteTask = async () => {
     try {
       await onDelete(id);
@@ -113,7 +120,7 @@ export default function TaskCard({
         <div className="flex items-center space-x-3">
           <Checkbox
             checked={checked}
-            onCheckedChange={handleCheckedChange} // Use the new handler
+            onCheckedChange={handleCheckedChange}
             className="h-5 w-5 rounded-full border-2 border-blue-800 flex-shrink-0 data-[state=checked]:bg-white data-[state=checked]:text-blue-800"
             disabled={!isEditTaskAllowed}
           />
@@ -133,6 +140,7 @@ export default function TaskCard({
               {title}
             </motion.h3>
             <motion.p className="text-sm opacity-70 truncate" layout="position">
+              {/* Format the time string if it's a valid date */}
               {time && !isNaN(new Date(time).getTime())
                 ? (() => {
                     const date = new Date(time);
@@ -140,7 +148,7 @@ export default function TaskCard({
                     const minutes = date.getUTCMinutes();
                     const ampm = hours >= 12 ? "PM" : "AM";
                     hours = hours % 12;
-                    hours = hours ? hours : 12; // the hour '0' should be '12'
+                    hours = hours ? hours : 12;
                     const strHours = hours.toString().padStart(2, "0");
                     const strMinutes = minutes.toString().padStart(2, "0");
                     return `${strHours}:${strMinutes} ${ampm}`;

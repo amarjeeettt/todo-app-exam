@@ -17,6 +17,7 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
 
   const isAddTaskAllowed = isToday(selectedDate) || isFuture(selectedDate);
 
+  // Filter tasks created on the selected date
   const todayTasks = tasks.filter(
     (task) =>
       new Date(task.createdAt).toDateString() === selectedDate.toDateString()
@@ -55,10 +56,10 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
             transition={{ duration: 0.3 }}
           >
             <CardTitle className="text-2xl font-bold text-textPrimary">
-              {format(selectedDate, "EEEE")}
+              {format(selectedDate, "EEEE")} {/* Display weekday */}
             </CardTitle>
             <p className="text-sm text-textSecondary">
-              {format(selectedDate, "MMMM d")}
+              {format(selectedDate, "MMMM d")} {/* Display full date */}
             </p>
           </motion.div>
         </CardHeader>
@@ -104,6 +105,7 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
                             transition={{ delay: index * 0.1 }}
                             exit={{ opacity: 0, y: -20 }}
                           >
+                            {/* Render task card */}
                             <TaskCard
                               id={task.id}
                               title={task.title}
@@ -126,7 +128,7 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
           </ScrollArea>
         </CardContent>
       </Card>
-      <Toaster />
+      <Toaster /> {/* Display notifications */}
     </>
   );
 }

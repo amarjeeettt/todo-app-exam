@@ -9,6 +9,7 @@ import {
   ReactNode,
 } from "react";
 
+// Define user and context types
 interface User {
   id: number;
   username: string;
@@ -26,6 +27,7 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+// Set session duration to 1 hour
 const SESSION_DURATION = 60 * 60 * 1000;
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -36,7 +38,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/logout", { method: "POST" });
       setUser(null);
       localStorage.removeItem("userSession");
     } catch (err) {
@@ -51,7 +53,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -60,6 +62,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
+        // Store user session in localStorage
         localStorage.setItem(
           "userSession",
           JSON.stringify({
@@ -84,7 +87,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -93,6 +96,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
+        // Store user session in localStorage
         localStorage.setItem(
           "userSession",
           JSON.stringify({
@@ -137,6 +141,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const sessionValid = checkSessionExpiration();
       if (!sessionValid) {
         try {
+          // Attempt to fetch user data if session is invalid
           const response = await fetch("/api/user");
           if (response.ok) {
             const userData = await response.json();
@@ -157,6 +162,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     checkAuth();
 
+    // Set up interval to check session expiration every minute
     const intervalId = setInterval(checkSessionExpiration, 60000);
 
     return () => clearInterval(intervalId);
@@ -178,7 +184,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     </UserContext.Provider>
   );
 }
-
+// Custom hook to use the UserContext
 export function useUser() {
   const context = useContext(UserContext);
   if (!context) {

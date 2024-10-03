@@ -16,21 +16,28 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AuthModal({ isOpen }: { isOpen: boolean }) {
+  // State for login and register forms
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [registerData, setRegisterData] = useState({
     username: "",
     password: "",
   });
+
+  // User context for authentication functions and state
   const { login, register, isLoading, error } = useUser();
 
+  // Handle login form submission
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     await login(loginData.username, loginData.password);
+    setLoginData({ username: "", password: "" });
   };
 
+  // Handle register form submission
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     await register(registerData.username, registerData.password);
+    setRegisterData({ username: "", password: "" });
   };
 
   return (
@@ -61,6 +68,7 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
             <TabsContent value="login">
               <form onSubmit={handleLogin}>
                 <div className="space-y-4">
+                  {/* Username input for login */}
                   <div className="space-y-2">
                     <Label htmlFor="username" className="text-sm font-medium">
                       Username
@@ -77,8 +85,10 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
                         })
                       }
                       disabled={isLoading}
+                      required
                     />
                   </div>
+                  {/* Password input for login */}
                   <div className="space-y-2">
                     <Label htmlFor="password" className="text-sm font-medium">
                       Password
@@ -92,9 +102,11 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
                         setLoginData({ ...loginData, password: e.target.value })
                       }
                       disabled={isLoading}
+                      required
                     />
                   </div>
                 </div>
+                {/* Login button with animation */}
                 <motion.div
                   className="mt-6"
                   whileHover={{ scale: 1.05 }}
@@ -108,6 +120,7 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
                     {isLoading ? (
                       <>
                         <span className="mr-2">
+                          {/* Loading spinner SVG */}
                           <svg
                             className="animate-spin h-5 w-5 text-white"
                             xmlns="http://www.w3.org/2000/svg"
@@ -141,6 +154,7 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
             <TabsContent value="register">
               <form onSubmit={handleRegister}>
                 <div className="space-y-4">
+                  {/* Username input for registration */}
                   <div className="space-y-2">
                     <Label htmlFor="username" className="text-sm font-medium">
                       Username
@@ -157,8 +171,10 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
                         })
                       }
                       disabled={isLoading}
+                      required
                     />
                   </div>
+                  {/* Password input for registration */}
                   <div className="space-y-2">
                     <Label
                       htmlFor="register-password"
@@ -178,9 +194,11 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
                         })
                       }
                       disabled={isLoading}
+                      required
                     />
                   </div>
                 </div>
+                {/* Register button with animation */}
                 <motion.div
                   className="mt-6"
                   whileHover={{ scale: 1.05 }}
@@ -194,6 +212,7 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
                     {isLoading ? (
                       <>
                         <span className="mr-2">
+                          {/* Loading spinner SVG (same as login) */}
                           <svg
                             className="animate-spin h-5 w-5 text-white"
                             xmlns="http://www.w3.org/2000/svg"

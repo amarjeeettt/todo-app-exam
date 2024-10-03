@@ -28,9 +28,9 @@ export default function Calendar({
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
 }) {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [direction, setDirection] = useState(0);
-  const { tasks } = useTasks();
+  const [currentMonth, setCurrentMonth] = useState(new Date()); // State to track the current month
+  const [direction, setDirection] = useState(0); // Direction of month transition
+  const { tasks } = useTasks(); // Fetch tasks from context
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -39,6 +39,7 @@ export default function Calendar({
 
   const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
+  // Check if there are tasks on a given date
   const hasTasksOnDay = (date: Date) => {
     return tasks.some(
       (task) =>
@@ -47,17 +48,19 @@ export default function Calendar({
     );
   };
 
+  // Handle date click event to select a date
   const handleDateClick = (day: Date) => {
     const isPastDate = isBefore(day, new Date());
 
     if (
-      isSameMonth(day, monthStart) &&
-      (isToday(day) || !isPastDate || hasTasksOnDay(day))
+      isSameMonth(day, monthStart) && // Ensure the date is in the current month
+      (isToday(day) || !isPastDate || hasTasksOnDay(day)) // Allow selecting today, future dates, or dates with tasks
     ) {
       setSelectedDate(day);
     }
   };
 
+  // Render weeks of the calendar
   const renderWeeks = () => {
     const weeks = [];
     let days = [];
@@ -65,13 +68,13 @@ export default function Calendar({
 
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
-        const cloneDay = new Date(day);
-        const isPastDate = isBefore(cloneDay, new Date());
-        const isTodayDate = isToday(cloneDay);
+        const cloneDay = new Date(day); // Clone the current day to avoid mutating
+        const isPastDate = isBefore(cloneDay, new Date()); // Check if the cloned day is in the past
+        const isTodayDate = isToday(cloneDay); // Check if the cloned day is today
 
         days.push(
           <div
-            key={day.toString()}
+            key={day.toString()} // Unique key for each day
             className="h-10 flex items-center justify-center"
           >
             <Button
@@ -111,9 +114,10 @@ export default function Calendar({
     setCurrentMonth((prevMonth) => addMonths(prevMonth, 1));
   };
 
+  // Variants for animation transitions
   const variants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
+      x: direction > 0 ? 1000 : -1000, // Slide in from the right or left
       opacity: 0,
     }),
     center: {
@@ -121,7 +125,7 @@ export default function Calendar({
       opacity: 1,
     },
     exit: (direction: number) => ({
-      x: direction < 0 ? 1000 : -1000,
+      x: direction < 0 ? 1000 : -1000, // Slide out to the right or left
       opacity: 0,
     }),
   };
@@ -142,6 +146,7 @@ export default function Calendar({
         </div>
       </CardHeader>
       <CardContent className="pb-4">
+        {/* Weekday headers */}
         <div className="grid grid-cols-7 gap-1 mb-2 mt-2">
           {weekDays.map((day) => (
             <div
@@ -152,6 +157,7 @@ export default function Calendar({
             </div>
           ))}
         </div>
+        {/* Calendar grid with animation */}
         <div className="relative overflow-hidden" style={{ height: "240px" }}>
           <AnimatePresence initial={false} custom={direction}>
             <motion.div

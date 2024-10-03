@@ -48,7 +48,7 @@ export default function UserMenu() {
           whileTap={{ scale: 0.9 }}
           className="bg-transparent border-none p-0 cursor-pointer"
         >
-          <User className="h-5 w-5" />
+          <User className="h-5 w-5" /> {/* Display user icon */}
         </motion.button>
       </PopoverTrigger>
       <AnimatePresence>
@@ -60,7 +60,7 @@ export default function UserMenu() {
             transition={{ duration: 0.2 }}
           >
             <div className="grid gap-2 sm:gap-4">
-              <LogoutButton />
+              <LogoutButton /> {/* Display the logout button */}
             </div>
           </motion.div>
         </PopoverContent>

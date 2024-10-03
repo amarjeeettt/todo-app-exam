@@ -13,7 +13,7 @@ const formatDate = (date: Date) => {
   return new Date(date).toLocaleString();
 };
 
-// NotificationItem Component
+// NotificationItem Component to display individual notifications
 const NotificationItem: React.FC<{
   notification: {
     id: number;
@@ -22,7 +22,7 @@ const NotificationItem: React.FC<{
     createdAt: Date;
     isRead: boolean;
   };
-  markAsRead: (id: number) => void;
+  markAsRead: (id: number) => void; // Function to mark notification as read
 }> = ({ notification, markAsRead }) => {
   return (
     <div
@@ -43,10 +43,10 @@ const NotificationItem: React.FC<{
   );
 };
 
-// NotificationBell Component
+// NotificationBell Component for displaying the bell icon and notification list
 export default function NotificationBell() {
   const { notifications, markAsRead, clearNotifications } = useNotifications();
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length; // Count unread notifications
 
   return (
     <Popover>

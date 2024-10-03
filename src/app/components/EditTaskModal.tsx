@@ -38,6 +38,7 @@ export default function EditTaskModal({
   selectedDate,
   task,
 }: EditTaskModalProps) {
+  // State for form fields and loading status
   const [title, setTitle] = useState(task.title);
   const [remindOnTime, setRemindOnTime] = useState("");
   const [remindOn, setRemindOn] = useState(false);
@@ -46,17 +47,21 @@ export default function EditTaskModal({
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Update form state when task prop changes
   useEffect(() => {
     setTitle(task.title);
     setIsImportant(task.isImportant);
     setIsCompleted(task.isCompleted);
+
     if (task.remindOn) {
       const remindOnDate = new Date(task.remindOn);
+
       setRemindOnTime(
         `${String(remindOnDate.getUTCHours()).padStart(2, "0")}:${String(
           remindOnDate.getUTCMinutes()
         ).padStart(2, "0")}`
       );
+
       setRemindOn(true);
     } else {
       setRemindOnTime("");
@@ -64,12 +69,17 @@ export default function EditTaskModal({
     }
   }, [task]);
 
+  // Handles form submission to edit a new task
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
+      // Calculate reminder time if set
       let remindOnDate = null;
+
       if (remindOn && remindOnTime) {
+        // Convert local time to UTC for consistent storage
         const [hours, minutes] = remindOnTime.split(":").map(Number);
         const localDate = new Date(selectedDate);
         localDate.setHours(hours, minutes, 0, 0);
@@ -78,6 +88,7 @@ export default function EditTaskModal({
         );
       }
 
+      // Call the update function with new task data
       await onUpdate({
         title,
         remindOn: remindOnDate ? remindOnDate.toISOString() : null,
@@ -85,6 +96,7 @@ export default function EditTaskModal({
         isCompleted,
       });
 
+      // Show success toast notification
       toast({
         title: "Task updated",
         description: "Your task has been successfully updated.",
@@ -93,6 +105,8 @@ export default function EditTaskModal({
       onClose();
     } catch (error) {
       console.error("Error updating task:", error);
+
+      // Show error toast notification
       toast({
         variant: "destructive",
         title: "Error",
@@ -119,6 +133,7 @@ export default function EditTaskModal({
             className="space-y-4"
           >
             <div className="space-y-4">
+              {/* Task title input */}
               <div className="flex flex-col space-y-2">
                 <Label htmlFor="title">Task</Label>
                 <Input
@@ -129,6 +144,7 @@ export default function EditTaskModal({
                   disabled={isLoading}
                 />
               </div>
+              {/* Reminder checkbox */}
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="remindOn"
@@ -138,6 +154,7 @@ export default function EditTaskModal({
                 />
                 <Label htmlFor="remindOn">Set Reminder</Label>
               </div>
+              {/* Animated reminder time input */}
               <AnimatePresence>
                 {remindOn && (
                   <motion.div
@@ -159,6 +176,7 @@ export default function EditTaskModal({
                 )}
               </AnimatePresence>
             </div>
+            {/* Submit button with loading state */}
             <div className="pt-4">
               <Button
                 type="submit"
@@ -168,6 +186,7 @@ export default function EditTaskModal({
                 {isLoading ? (
                   <>
                     <span className="mr-2">
+                      {/* Loading spinner SVG */}
                       <svg
                         className="animate-spin h-5 w-5 text-white"
                         xmlns="http://www.w3.org/2000/svg"

@@ -11,6 +11,7 @@ import React, {
 } from "react";
 import { useUser } from "./UserContext";
 
+// Define Task interface and related types
 interface Task {
   id: number;
   title: string;
@@ -23,6 +24,7 @@ interface Task {
 type CreateTaskData = Omit<Task, "id" | "userID">;
 type UpdateTaskData = Partial<Omit<Task, "id" | "userID" | "createdAt">>;
 
+// Define TaskContext interface
 interface TaskContextType {
   tasks: Task[];
   isLoading: boolean;
@@ -41,6 +43,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
 
+  // Fetch tasks from the API
   const fetchTasks = useCallback(async () => {
     if (user) {
       setIsLoading(true);
@@ -64,6 +67,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
+  // Create a new task
   const createTask = useCallback(async (taskData: CreateTaskData) => {
     setIsLoading(true);
     setError(null);
@@ -91,10 +95,12 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Update an existing task
   const updateTask = useCallback(
     async (id: number, updates: UpdateTaskData) => {
       setError(null);
 
+      // Optimistically update the task
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === id ? { ...task, ...updates } : task
@@ -120,6 +126,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
           throw new Error(`Failed to update task: ${response.statusText}`);
         }
       } catch (error) {
+        // Revert the optimistic update on error
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
             task.id === id ? { ...task, ...updates } : task
@@ -134,6 +141,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  // Delete a task
   const deleteTask = useCallback(async (id: number) => {
     setError(null);
     try {
@@ -153,10 +161,12 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Fetch tasks when the component mounts or user changes
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
+  // Memoize the context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({
       tasks,
@@ -175,6 +185,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Custom hook to use the TaskContext
 export function useTasks() {
   const context = useContext(TaskContext);
   if (context === undefined) {

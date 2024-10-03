@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
+// Get JWT secret key from environment variables
 const JWT_SECRET_KEY: string = process.env.JWT_SECRET_KEY as string;
 
 export async function POST(req: Request) {
@@ -21,7 +22,9 @@ export async function POST(req: Request) {
       );
     }
 
+    // Compare provided password with stored hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: "Invalid credentials" },
@@ -29,19 +32,22 @@ export async function POST(req: Request) {
       );
     }
 
+    // Generate JWT token
     const token = jwt.sign({ userId: user.id }, JWT_SECRET_KEY, {
       expiresIn: "1h",
     });
 
+    // Set JWT token in HTTP-only cookie
     cookies().set({
       name: "token",
       value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 60 * 60,
+      maxAge: 60 * 60, // 1 hour
     });
 
+    // Return user data (excluding sensitive information)
     return NextResponse.json({
       id: user.id,
       username: user.username,

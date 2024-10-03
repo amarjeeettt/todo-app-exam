@@ -9,6 +9,7 @@ import TaskProgressSkeleton from "./skeleton/TaskProgressSkeleton";
 export default function ProgressCard() {
   const { tasks, isLoading } = useTasks();
 
+  // Calculate total, completed tasks, and progress percentage
   const { totalTasks, completedTasks, progress } = useMemo(() => {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter((task) => task.isCompleted).length;
@@ -16,6 +17,7 @@ export default function ProgressCard() {
     return { totalTasks, completedTasks, progress };
   }, [tasks]);
 
+  // Progress messages based on completion percentage
   const progressMessages = [
     { title: "Keep going!", message: "You're just getting started." },
     { title: "Great Job!", message: "You're making progress." },
@@ -24,6 +26,7 @@ export default function ProgressCard() {
     { title: "Hurrah!", message: "You did it!" },
   ];
 
+  // Determine the index of the progress message
   const messageIndex = Math.min(
     Math.floor(progress / 25),
     progressMessages.length - 1
