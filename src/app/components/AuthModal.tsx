@@ -21,61 +21,16 @@ export default function AuthModal({ isOpen }: { isOpen: boolean }) {
     username: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const { login } = useUser();
+  const { login, register, isLoading, error } = useUser();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        login(userData);
-      } else {
-        setError("Invalid username or password");
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-      console.error("Login error: ", error);
-    } finally {
-      setIsLoading(false);
-    }
+    await login(loginData.username, loginData.password);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(registerData),
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        login(userData);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || "Registration failed");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error("Register error: ", err);
-    } finally {
-      setIsLoading(false);
-    }
+    await register(registerData.username, registerData.password);
   };
 
   return (

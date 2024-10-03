@@ -10,7 +10,6 @@ export async function POST(req: Request) {
   try {
     const { username, password } = await req.json();
 
-    // Fetch user from the database
     const user = await prisma.user.findUnique({
       where: { username },
     });
@@ -22,7 +21,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -31,12 +29,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user.id }, JWT_SECRET_KEY, {
       expiresIn: "1h",
     });
 
-    // Set cookie
     cookies().set({
       name: "token",
       value: token,
@@ -46,7 +42,10 @@ export async function POST(req: Request) {
       maxAge: 60 * 60,
     });
 
-    return NextResponse.json({ message: "Login successful" });
+    return NextResponse.json({
+      id: user.id,
+      username: user.username,
+    });
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

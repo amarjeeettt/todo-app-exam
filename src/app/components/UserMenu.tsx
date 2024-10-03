@@ -10,23 +10,11 @@ import { useUser } from "@/contexts/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 // LogoutButton Component
-const LogoutButton: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
-  const { logout } = useUser();
+const LogoutButton: React.FC = () => {
+  const { logout, isLoading } = useUser();
 
   const handleLogout = async () => {
-    try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-      });
-      if (response.ok) {
-        logout();
-        onLogout();
-      } else {
-        console.error("Failed to log out.");
-      }
-    } catch (error) {
-      console.error("An error occurred during logout:", error);
-    }
+    await logout();
   };
 
   return (
@@ -35,16 +23,23 @@ const LogoutButton: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         variant="ghost"
         className="w-full justify-start"
         onClick={handleLogout}
+        disabled={isLoading}
       >
         <LogOut className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-        <span className="text-sm sm:text-base">Logout</span>
+        <span className="text-sm sm:text-base">
+          {isLoading ? "Logging out..." : "Logout"}
+        </span>
       </Button>
     </motion.div>
   );
 };
 
 // UserMenu Component
-export default function UserMenu({ onLogout }: { onLogout: () => void }) {
+export default function UserMenu() {
+  const { user } = useUser();
+
+  if (!user) return null;
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -65,7 +60,7 @@ export default function UserMenu({ onLogout }: { onLogout: () => void }) {
             transition={{ duration: 0.2 }}
           >
             <div className="grid gap-2 sm:gap-4">
-              <LogoutButton onLogout={onLogout} />
+              <LogoutButton />
             </div>
           </motion.div>
         </PopoverContent>

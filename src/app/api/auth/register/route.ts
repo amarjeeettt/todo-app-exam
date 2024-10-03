@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
     if (userExists) {
       return NextResponse.json(
-        { error: "User already exists" },
+        { error: "Username already exists" },
         { status: 400 }
       );
     }
@@ -30,12 +30,10 @@ export async function POST(req: Request) {
       },
     });
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user.id }, JWT_SECRET_KEY, {
       expiresIn: "1h",
     });
 
-    // Set cookie
     cookies().set({
       name: "token",
       value: token,
@@ -46,8 +44,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({
-      message: "User created and logged in successfully",
-      user: { id: user.id, username: user.username },
+      id: user.id,
+      username: user.username,
     });
   } catch (error) {
     console.error("Registration error:", error);

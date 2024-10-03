@@ -25,10 +25,6 @@ export default function HomeClient() {
     }
   }, [user]);
 
-  const handleLogout = () => {
-    setAuthModalOpen(true); // Open the AuthModal when logging out
-  };
-
   return (
     <>
       <AuthModal isOpen={isAuthModalOpen} />
@@ -37,7 +33,7 @@ export default function HomeClient() {
           <div className="flex justify-end mb-4">
             <div className="flex items-center gap-6">
               <NotificationBell />
-              <UserMenu onLogout={handleLogout} />
+              <UserMenu />
             </div>
           </div>
           <div className="flex flex-col gap-7 h-full md:flex-col lg:flex-row">
