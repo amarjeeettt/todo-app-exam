@@ -37,7 +37,6 @@ interface TaskCardProps {
 export default function TaskCard({
   id,
   title,
-  time,
   selectedDate,
   remindOn,
   isImportant,
@@ -144,9 +143,9 @@ export default function TaskCard({
             </motion.h3>
             <motion.p className="text-sm opacity-70 truncate" layout="position">
               {/* Format and display the time if it's valid, otherwise show "No reminder" */}
-              {time && !isNaN(new Date(time).getTime())
+              {remindOn && !isNaN(new Date(remindOn).getTime())
                 ? (() => {
-                    const date = new Date(time);
+                    const date = new Date(remindOn);
                     let hours = date.getUTCHours();
                     const minutes = date.getUTCMinutes();
                     const ampm = hours >= 12 ? "PM" : "AM";

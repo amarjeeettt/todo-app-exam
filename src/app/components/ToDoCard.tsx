@@ -112,9 +112,6 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
                             <TaskCard
                               id={task.id}
                               title={task.title}
-                              time={
-                                task.remindOn ? task.remindOn : "No reminder"
-                              }
                               selectedDate={selectedDate}
                               remindOn={task.remindOn}
                               isImportant={task.isImportant}
