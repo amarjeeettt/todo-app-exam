@@ -163,7 +163,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     checkAuth();
 
     // Set up interval to check session expiration every minute
-    const intervalId = setInterval(checkSessionExpiration, 60000);
+    const intervalId = setInterval(checkSessionExpiration, 600000);
 
     return () => clearInterval(intervalId);
   }, [checkSessionExpiration]);

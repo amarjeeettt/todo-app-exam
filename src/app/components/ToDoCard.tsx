@@ -49,6 +49,7 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
     <>
       <Card className="h-full flex flex-col">
         <CardHeader className="flex flex-col items-center justify-between space-y-0 pb-2">
+          {/* Date display */}
           <motion.div
             className="text-center"
             initial={{ scale: 0.9 }}
@@ -64,6 +65,7 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
           </motion.div>
         </CardHeader>
         <CardContent className="flex flex-col flex-grow">
+          {/* "To Do Tasks" header */}
           <div className="flex justify-between items-center mt-6">
             <motion.h2
               className="text-2xl font-semibold text-textPrimary"
@@ -80,6 +82,7 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
             selectedDate={selectedDate}
             disabled={!isAddTaskAllowed}
           />
+          {/* Scrollable task list area */}
           <ScrollArea className="mt-4 overflow-hidden h-[33rem]">
             <AnimatePresence>
               <ul className="space-y-4">
@@ -105,7 +108,7 @@ export default function ToDoCard({ selectedDate }: { selectedDate: Date }) {
                             transition={{ delay: index * 0.1 }}
                             exit={{ opacity: 0, y: -20 }}
                           >
-                            {/* Render task card */}
+                            {/* Render individual task card */}
                             <TaskCard
                               id={task.id}
                               title={task.title}

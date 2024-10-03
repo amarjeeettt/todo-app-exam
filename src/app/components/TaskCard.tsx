@@ -117,6 +117,7 @@ export default function TaskCard({
         transition={{ duration: 0.3 }}
         layout
       >
+        {/* Checkbox container */}
         <div className="flex items-center space-x-3">
           <Checkbox
             checked={checked}
@@ -125,11 +126,13 @@ export default function TaskCard({
             disabled={!isEditTaskAllowed}
           />
         </div>
+        {/* Task card */}
         <Card
           className={`flex-grow flex items-center py-3 px-4 ${
             checked ? "bg-disable text-textDisable" : "bg-primary text-white"
           } rounded-lg`}
         >
+          {/* Task title and time */}
           <motion.div layout className="flex-grow min-w-0 pr-4">
             <motion.h3
               className={`text-lg font-semibold truncate ${
@@ -140,7 +143,7 @@ export default function TaskCard({
               {title}
             </motion.h3>
             <motion.p className="text-sm opacity-70 truncate" layout="position">
-              {/* Format the time string if it's a valid date */}
+              {/* Format and display the time if it's valid, otherwise show "No reminder" */}
               {time && !isNaN(new Date(time).getTime())
                 ? (() => {
                     const date = new Date(time);
@@ -156,7 +159,9 @@ export default function TaskCard({
                 : "No reminder"}
             </motion.p>
           </motion.div>
+          {/* Task actions */}
           <div className="flex items-center space-x-2 flex-shrink-0">
+            {/* Importance star icon */}
             <AnimatePresence>
               {important && (
                 <motion.div
@@ -168,6 +173,7 @@ export default function TaskCard({
                 </motion.div>
               )}
             </AnimatePresence>
+            {/* More options popover */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -192,6 +198,7 @@ export default function TaskCard({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2 }}
                 >
+                  {/* Toggle importance button */}
                   <Button
                     variant="ghost"
                     onClick={handleImportantChange}
@@ -201,6 +208,7 @@ export default function TaskCard({
                     <Star className="mr-2 h-4 w-4" />
                     {important ? "Remove importance" : "Mark as important"}
                   </Button>
+                  {/* Edit task button */}
                   <Button
                     variant="ghost"
                     className="justify-start"
@@ -210,6 +218,7 @@ export default function TaskCard({
                     <Edit className="mr-2 h-4 w-4" />
                     Edit task
                   </Button>
+                  {/* Delete task button */}
                   <Button
                     variant="ghost"
                     className="justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
